@@ -1,3 +1,6 @@
+#This code defines a small “agent” class that uses your CV data (PDF + summary text) \n
+#to answer chat questions as if it were you, and can also call helper tools when needed.
+
 from dotenv import load_dotenv
 from openai import OpenAI
 import json
@@ -7,13 +10,13 @@ from pypdf import PdfReader
 import gradio as gr
 
 
-load_dotenv(override=True)
+load_dotenv(override=True) #loads api keys
 
 def push(text):
     requests.post(
         "https://api.pushover.net/1/messages.json",
         data={
-            "token": os.getenv("PUSHOVER_TOKEN"),
+            "token": os.getenv("PUSHOVER_TOKEN"), #explicitly getting keys
             "user": os.getenv("PUSHOVER_USER"),
             "message": text,
         }
@@ -73,22 +76,22 @@ tools = [{"type": "function", "function": record_user_details_json},
         {"type": "function", "function": record_unknown_question_json}]
 
 
-class Me:
+class Me: #to define a custom python class, each instance = is a chatbot persona
 
     def __init__(self):
-        self.openai = OpenAI()
-        self.name = "Ed Donner"
-        reader = PdfReader("me/linkedin.pdf")
+        self.openai = OpenAI() #stores client object data for chat completions API - extracts open api key
+        self.name = "Alexander Pikelis"
+        reader = PdfReader("me/Profile.pdf")
         self.linkedin = ""
         for page in reader.pages:
             text = page.extract_text()
             if text:
                 self.linkedin += text
         with open("me/summary.txt", "r", encoding="utf-8") as f:
-            self.summary = f.read()
+            self.summary = f.read() #reads pdf with summary into self.summary
 
 
-    def handle_tool_call(self, tool_calls):
+    def handle_tool_call(self, tool_calls): #called when model asks to run a tool
         results = []
         for tool_call in tool_calls:
             tool_name = tool_call.function.name
