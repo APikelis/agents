@@ -7,7 +7,7 @@ import asyncio
 
 class ResearchManager:
 
-    async def run(self, query: str):
+    async def run(self, query: str): 
         """ Run the deep research process, yielding the status updates and the final report"""
         trace_id = gen_trace_id()
         with trace("Research trace", trace_id=trace_id):
